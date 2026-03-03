@@ -134,5 +134,5 @@ resource "digitalocean_record" "vaultwarden_a" {
   domain = var.login
   type   = "A"
   name   = "vault"
-  value = "57.129.124.84"
+  value  = "57.129.124.84"
 }
