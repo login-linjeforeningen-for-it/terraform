@@ -129,3 +129,11 @@ resource "digitalocean_record" "logout_a" {
   ttl    = 300
   value  = "128.39.142.138"
 }
+
+resource "digitalocean_record" "vaultwarden_a" {
+  domain = var.login
+  type   = "A"
+  name   = "vault"
+  ttl    = 300
+  value  = "57.129.124.84"
+}
