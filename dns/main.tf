@@ -137,3 +137,11 @@ resource "digitalocean_record" "vaultwarden_a" {
   ttl    = 300
   value  = "57.129.124.84"
 }
+
+resource "digitalocean_record" "offprem_record" {
+  domain = var.login
+  type   = "A"
+  name   = "offprem"
+  ttl    = 300
+  value  = "57.129.124.84"
+}
