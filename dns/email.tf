@@ -108,7 +108,7 @@ resource "digitalocean_record" "mx_record" {
 }
 
 resource "digitalocean_record" "spf_allow" {
-  for_each = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c }
+  for_each = { for c in local.whitelist_domains : "${c.domain}-${c.name}-${c.spf}" => c }
   domain   = each.value.domain
   type     = "TXT"
   name     = each.value.name
@@ -116,7 +116,7 @@ resource "digitalocean_record" "spf_allow" {
 }
 
 resource "digitalocean_record" "dkim_allow" {
-  for_each = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c }
+  for_each = { for c in local.whitelist_domains : "${c.domain}-${c.name}-${c.dkim.selector}" => c }
   domain   = each.value.domain
   type     = "TXT"
   name     = "${each.value.dkim.selector}._domainkey${each.value.name == "@" ? "" : ".${each.value.name}"}"
@@ -144,7 +144,7 @@ resource "digitalocean_record" "dkim_block" {
 
 // --------------------- DMARC ---------------------
 resource "digitalocean_record" "dmarc_whitelist" {
-  for_each = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c }
+  for_each = { for c in local.whitelist_domains : "${c.domain}-${c.name}-${c.dkim.selector}" => c }
   domain   = each.value.domain
   type     = "TXT"
   name     = "_dmarc${each.value.name == "@" ? "" : ".${each.value.name}"}"
