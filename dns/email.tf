@@ -11,11 +11,11 @@ locals {
       mx_records = [
         {
           value    = "mx1.emailsrvr.com."
-          priority = 10
+          priority = 30
         },
         {
           value    = "mx2.emailsrvr.com."
-          priority = 20
+          priority = 40
         }
       ]
     },
@@ -30,11 +30,11 @@ locals {
       mx_records = [
         {
           value    = "mx1.emailsrvr.com."
-          priority = 10
+          priority = 30
         },
         {
           value    = "mx2.emailsrvr.com."
-          priority = 20
+          priority = 40
         }
       ]
     },
@@ -68,11 +68,11 @@ locals {
       mx_records = [
         {
           value    = "smtp.google.com."
-          priority = 30
+          priority = 10
         },
         {
           value    = "smtp.google.com."
-          priority = 40
+          priority = 20
         }
       ]
     }
