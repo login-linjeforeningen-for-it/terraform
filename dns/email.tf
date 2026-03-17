@@ -1,25 +1,6 @@
 locals {
   whitelist_domains = [
     {
-      domain = "login.no"
-      name   = "@"
-      spf    = "v=spf1 include:emailsrvr.com ~all"
-      dkim = {
-        selector = "20221010-xpztq0z9"
-        key      = "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDx+Vek3w/EJdI45vWGjjYKdlLxkv1tl1T/6pR2pKyC//6SQDUTQJv7zpoFii8Ai4jLfW88du9MegqorSwY8/bTEbylhbyHQ/7xZcQntTZ43lL4EJc7pk7bw+FZIxBziKLNhejJhx+SlhpOTQkvyc/E+DK/pB14YhbMx2XiZjjD2QIDAQAB"
-      }
-      mx_records = [
-        {
-          value    = "mx1.emailsrvr.com."
-          priority = 30
-        },
-        {
-          value    = "mx2.emailsrvr.com."
-          priority = 40
-        }
-      ]
-    },
-    {
       domain = "logntnu.no"
       name   = "@"
       spf    = "v=spf1 include:emailsrvr.com ~all"
@@ -50,10 +31,21 @@ locals {
         {
           value    = "smtp.google.com."
           priority = 30
-        },
+        }
+      ]
+    },
+    {
+      domain = "login.no"
+      name   = "vault"
+      spf    = "v=spf1 include:_spf.google.com ~all"
+      dkim = {
+        selector = "google"
+        key      = "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1UyFVEOjE/yFSGJW4ah3GpDzy6SlK9Fio1W572o8hkremSfWS+eLC38u7q+5ZcvGqM4vif3+Pgc6lX3IVQ5cojpyc/8yrlq4hJk8efwulyAvSsMqoL/8sDwtby8g9aiy+c4qqnGKUFMf+s0+dWiByMKvFQcJNfmMYUK4Xg1Anodo0cOZvKDk7C+sdegq49cDCcLn9lTDI6YeSpYkkwtPACHUuaB2uaBQypUwls3AJKkZHQC/U1oxkY9G3bwwbDVDn1C16i+8zKyadVImsLD/yJQ4i2DqUoHsN0N+0VoiYo3T24J8g4KScyRycLEpszB1OQbAQWLLO4KBWUE1sN8K5QIDAQAB"
+      }
+      mx_records = [
         {
           value    = "smtp.google.com."
-          priority = 40
+          priority = 30
         }
       ]
     },
@@ -69,10 +61,6 @@ locals {
         {
           value    = "smtp.google.com."
           priority = 10
-        },
-        {
-          value    = "smtp.google.com."
-          priority = 20
         }
       ]
     }
