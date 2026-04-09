@@ -138,10 +138,10 @@ resource "digitalocean_record" "vaultwarden_a" {
   value  = "57.129.124.84"
 }
 
-resource "digitalocean_record" "ovh_authentik_a" {
+resource "digitalocean_record" "zammad_migration_a" {
   domain = var.login
   type   = "A"
-  name   = "authentik2"
+  name   = "zammad-m"
   ttl    = 300
   value  = "57.129.124.84"
 }
