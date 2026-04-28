@@ -1,5 +1,5 @@
 locals {
-  excluded     = ["logout.no", var.login]
+  excluded     = [var.logout, var.login]
   domain_names = [for d in module.domeneshop.domain_names : d if contains(local.excluded, d) == false]
 }
 
