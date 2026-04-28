@@ -68,7 +68,7 @@ locals {
   email_domains = [
     for d in local.whitelist_domains : d.domain
   ]
-  blacklist_domains = [for d in module.domains.domain_names : d if !contains(local.email_domains, d)]
+  blacklist_domains = [for d in module.domeneshop.domain_names : d if !contains(local.email_domains, d)]
 }
 
 // --------------------- Whitelist ---------------------
