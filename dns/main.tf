@@ -57,3 +57,11 @@ resource "digitalocean_record" "offprem_record" {
   ttl    = 300
   value  = var.offprem_ip
 }
+
+resource "digitalocean_record" "linux_install_party_record" {
+  domain = var.login
+  type   = "A"
+  name   = "linux"
+  ttl    = 300
+  value  = "128.39.142.60"
+}
