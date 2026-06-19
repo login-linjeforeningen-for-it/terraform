@@ -5,7 +5,8 @@ locals {
     "idrac3",
     "pve",
     "truenas",
-    "pelican"
+    "pelican",
+    "pfsense"
   ]
 }
 
