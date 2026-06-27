@@ -1,7 +1,7 @@
-## Requred secrets
+## Required secrets
 State:
 AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
 
-Digital ocean:
+DigitalOcean:
 DIGITALOCEAN_TOKEN
