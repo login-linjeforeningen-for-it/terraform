@@ -50,6 +50,14 @@ resource "digitalocean_record" "zammad_a" {
   value  = var.offprem_ip
 }
 
+resource "digitalocean_record" "n8n_a" {
+  domain = var.login
+  type   = "A"
+  name   = "n8n"
+  ttl    = 300
+  value  = var.offprem_ip
+}
+
 resource "digitalocean_record" "offprem_record" {
   domain = var.login
   type   = "A"
