@@ -66,10 +66,27 @@ resource "digitalocean_record" "offprem_record" {
   value  = var.offprem_ip
 }
 
+// Linux install party records
 resource "digitalocean_record" "linux_install_party_record" {
   domain = var.login
   type   = "A"
   name   = "linux"
   ttl    = 300
+  value  = var.offprem_ip
+}
+
+resource "digitalocean_record" "linux_install_party_ntnu_record" {
+  domain = var.login
+  type   = "A"
+  name   = "ntnu.linux"
+  ttl    = 300
   value  = "128.39.142.60"
+}
+
+resource "digitalocean_record" "linux_install_party_ovhcloud_record" {
+  domain = var.login
+  type   = "CNAME"
+  name   = "ovhcloud.linux"
+  ttl    = 300
+  value  = "tekkom-linux.s3.de.io.cloud.ovh.net."
 }
