@@ -5,6 +5,9 @@ on:
       stack:
         required: true
         type: string
+      plan:
+        default: true
+        type: boolean
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -32,8 +35,16 @@ jobs:
       stack: ${{ inputs.stack }}
       action: "fmt"
       env: "development"
+  test:
+    needs: [validate]
+    uses: ./.github/workflows/tofu.yml
+    secrets: inherit
+    with:
+      stack: ${{ inputs.stack }}
+      action: "test"
+      env: "development"
   plan:
-    needs: [validate, fmt]
+    needs: [test]
     uses: ./.github/workflows/tofu.yml
     secrets: inherit
     with:

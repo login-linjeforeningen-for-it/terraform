@@ -1,0 +1,15 @@
+name: Domeneshop tests
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'modules/domeneshop/**'
+
+jobs:
+  checks:
+    uses: ./.github/workflows/pr-checks.yml
+    secrets: inherit
+    with:
+      stack: "modules/domeneshop"
+      plan: false
