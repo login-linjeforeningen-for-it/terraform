@@ -1,8 +1,8 @@
 terraform {
   required_providers {
-    digitalocean = {
-      source  = "digitalocean/digitalocean"
-      version = "~> 2.0"
+    ovh = {
+      source  = "ovh/ovh"
+      version = "~> 1.5"
     }
   }
   backend "s3" {
@@ -19,3 +19,6 @@ terraform {
   }
 }
 
+provider "ovh" {
+  endpoint = "ovh-ca"
+}

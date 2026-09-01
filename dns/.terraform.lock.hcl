@@ -1,30 +1,6 @@
 # This file is maintained automatically by "tofu init".
 # Manual edits may be lost in future updates.
 
-provider "registry.opentofu.org/digitalocean/digitalocean" {
-  version     = "2.68.0"
-  constraints = "~> 2.0"
-  hashes = [
-    "h1:UQIGXR0f4ww/82st1CqhiK1h0L2kzioDwmgKcexxRX8=",
-    "zh:033ffed5ce70ee146ec1eb2d1987c753bf40eab846c9a1cb842a2d295effe2bb",
-    "zh:048c3539523b98f85cb3e62e58514523541131f2a4dbc4071634a2b7cd49d06b",
-    "zh:0d06707a8847f28e66027ea9510bce3a2262f2a253cb45ce319f8aaa6f95a891",
-    "zh:1237b2845a2a9d87173426a7b2722782f5e00927c977e6851a972281137f4373",
-    "zh:2cc11d317e2059d40ec7f426e997b108ed725a7e3f7ddca8a2e9211e8dac62f8",
-    "zh:3171e58ac057ad172f4135d6933aeaa8b5c122f8d8ea262b7bd89e3061405fe4",
-    "zh:423757ef492328f90a5cbf99e2ee4b8d20b92b104ed8f9c1a7dac1964b93e62e",
-    "zh:4586a0e24c11b1d0e5993f2abec7f4a1ca3bbccb6c6a49ed7acdea58b74a15c4",
-    "zh:4c3a0fc5838c636b879d75f3aa2660913754d7ceef2206f3f42fd99347fef6e3",
-    "zh:64365359bba61eadd8d604728de7b1d482866ead7a2f4edc61e2d68b629e2fc9",
-    "zh:97fa44a72ecceb1304e5c68eecd2ea991ef324527f23dc90d86fbef1352c23f5",
-    "zh:d31223f29862edddc85dbfbfc6f3438c26d07a24ad3cf71ec9e63f242c1eada6",
-    "zh:d684e9d851e94c4ce75cf1a29bea2543afec88c435c36a9d8c8338ca727273ac",
-    "zh:f001b59b8ba2045e7985a8cbd69eeefef68212ef4ea7bb215ea83e208eb7691e",
-    "zh:fca7b11e77cf8bcef7b7c4c863b77faa2af66b85b5e4546bf8f5ca4b147ad1b2",
-    "zh:fdf90c608b079922206a94117fc66cd6a55e9b4705144daaf7f056ca30b046b6",
-  ]
-}
-
 provider "registry.opentofu.org/innovationnorway/domeneshop" {
   version     = "0.1.0"
   constraints = "0.1.0"
@@ -41,5 +17,27 @@ provider "registry.opentofu.org/innovationnorway/domeneshop" {
     "zh:df07c9c3af303c3cb3f4a6df41149de68532939a7a25e46b1f20445c2df1aafa",
     "zh:f83db9c453109e5da211bc28f18d092916ab89d367b3f4eaaa39ab51b089be18",
     "zh:fd722b139382f5aa68db5cf6ae1bc9e1fab5a613c56407262ad0b69c284c4c42",
+  ]
+}
+
+provider "registry.opentofu.org/ovh/ovh" {
+  version     = "1.8.0"
+  constraints = "~> 1.5"
+  hashes = [
+    "h1:uforg5SSBOVHu0bHCVuKJhqv6TqI1q2oLiWid1WJDB0=",
+    "zh:13de915a1de2f2d52daf3843be04b73b8c28102b4798b6519226ceba6de462a1",
+    "zh:229a6b42faaac23855d5b894a3d1116aa4bfe959870bf52820eba645dd84d240",
+    "zh:37c04f19df0462ae399d63da2a20efe16c8234302ef6ef7999f4ab9b17f82c84",
+    "zh:4145c35b7b06a3557c7d06694b4608356abb6c368b5ce94dea407b548c181213",
+    "zh:6848937828ec8f38fad2776abdfbcffc3cd353fbfb5885a2c1987775781e522b",
+    "zh:6d071a2ddcaddb318452b46782ae2f239acb1c83953248521858b59ff9651c98",
+    "zh:825ac2271e7f532d40e4633380fbe6ea7efca733b1e25ed01ed02e10bbb6e2bc",
+    "zh:9d24c56db0ced569615f84462d362a984d930cf21bbdbe69cf029cd89b9b179a",
+    "zh:a87773b85c2c732f8d03b65058cb595ec78a7fd5ad29ea61e69d4d3141675c40",
+    "zh:be454013f64a42f24cb1d7e14090dd03257fc387f0fff0e2992db77b47c125cf",
+    "zh:d4613672416be037a929e92d4c32e4d40eb5a7db4e2b67c689be6a00d91a7f46",
+    "zh:e435a038d9dc53bd3249c6f155311ea0bcbbba753e65236b2b5b630ae5917eb0",
+    "zh:ea0d3097edfbfd3e55140a04d570436fd62f2c18b7d4abbed3eb7d8a6781c875",
+    "zh:f88df12b81d7cbc320cf40dbca3cc45293cc74b8535362ed1a8360c487d744ee",
   ]
 }

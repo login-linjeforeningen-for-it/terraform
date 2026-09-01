@@ -1,7 +1,6 @@
 # Domeneshop module
 
-A module to interact with Domeneshop.
-It exports the list of registered domains and tests that the nameservers are configured correctly.
+A read-only module that queries the Domeneshop API for the registered domains.
 
 ## Secrets
 
@@ -11,3 +10,4 @@ It exports the list of registered domains and tests that the nameservers are con
 ## Output
 
 - domain_names: [string] A list of all the domains we have
+- nameservers: { domain => [string] } Current registry nameservers per domain

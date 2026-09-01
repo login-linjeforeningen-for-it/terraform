@@ -10,8 +10,12 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
-      DIGITALOCEAN_TOKEN:
-        required: false
+      OVH_APPLICATION_KEY:
+        required: true
+      OVH_APPLICATION_SECRET:
+        required: true
+      OVH_CONSUMER_KEY:
+        required: true
       DOMENESHOP_TOKEN:
         required: false
       DOMENESHOP_SECRET:

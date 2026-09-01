@@ -1,92 +1,76 @@
-
-
-// Register all domains in Digitalocean
-resource "digitalocean_domain" "all_domains" {
-  for_each = toset(module.domeneshop.domain_names)
-  name     = each.value
-
+resource "ovh_domain_zone_record" "apex_a" {
+  for_each  = toset(local.managed_domains)
+  zone      = each.value
+  subdomain = ""
+  fieldtype = "A"
+  ttl       = local.zone_ttl[each.value]
+  target    = var.onprem_ip
 }
 
-// Create A records for each domain
-// All top level domains point to the onprem proxy
-resource "digitalocean_record" "a_login_records" {
-  for_each = digitalocean_domain.all_domains
+# ---------------- login.no service records ----------------
 
-  domain = each.value.name
-  name   = "@"
-  type   = "A"
-  value  = var.onprem_ip
-
+resource "ovh_domain_zone_record" "cdn_cname" {
+  zone      = var.login
+  subdomain = "cdn"
+  fieldtype = "CNAME"
+  ttl       = local.ttl_low
+  target    = "beehive.ams3.cdn.digitaloceanspaces.com."
 }
 
-resource "digitalocean_record" "cdn_cname" {
-  domain = var.login
-  type   = "CNAME"
-  name   = "cdn"
-  value  = "beehive.ams3.cdn.digitaloceanspaces.com."
+resource "ovh_domain_zone_record" "login_wildcard_a" {
+  zone      = var.login
+  subdomain = "*"
+  fieldtype = "A"
+  ttl       = local.ttl_low
+  target    = var.onprem_ip
 }
 
-resource "digitalocean_record" "login_wildcard_a" {
-  domain = var.login
-  type   = "A"
-  name   = "*"
-  ttl    = 300
-  value  = var.onprem_ip
+resource "ovh_domain_zone_record" "vaultwarden_a" {
+  zone      = var.login
+  subdomain = "vault"
+  fieldtype = "A"
+  ttl       = local.ttl_low
+  target    = var.offprem_ip
 }
 
-resource "digitalocean_record" "vaultwarden_a" {
-  domain = var.login
-  type   = "A"
-  name   = "vault"
-  ttl    = 300
-  value  = var.offprem_ip
+resource "ovh_domain_zone_record" "zammad_a" {
+  zone      = var.login
+  subdomain = "zammad"
+  fieldtype = "A"
+  ttl       = local.ttl_low
+  target    = var.offprem_ip
 }
 
-resource "digitalocean_record" "zammad_a" {
-  domain = var.login
-  type   = "A"
-  name   = "zammad"
-  ttl    = 300
-  value  = var.offprem_ip
+resource "ovh_domain_zone_record" "offprem_a" {
+  zone      = var.login
+  subdomain = "offprem"
+  fieldtype = "A"
+  ttl       = local.ttl_low
+  target    = var.offprem_ip
 }
 
-resource "digitalocean_record" "n8n_a" {
-  domain = var.login
-  type   = "A"
-  name   = "n8n"
-  ttl    = 300
-  value  = var.offprem_ip
+# ---------------- Linux install party ----------------
+
+resource "ovh_domain_zone_record" "linux_a" {
+  zone      = var.login
+  subdomain = "linux"
+  fieldtype = "A"
+  ttl       = local.ttl_low
+  target    = var.offprem_ip
 }
 
-resource "digitalocean_record" "offprem_record" {
-  domain = var.login
-  type   = "A"
-  name   = "offprem"
-  ttl    = 300
-  value  = var.offprem_ip
+resource "ovh_domain_zone_record" "linux_ntnu_a" {
+  zone      = var.login
+  subdomain = "ntnu.linux"
+  fieldtype = "A"
+  ttl       = local.ttl_low
+  target    = "128.39.142.60"
 }
 
-// Linux install party records
-resource "digitalocean_record" "linux_install_party_record" {
-  domain = var.login
-  type   = "A"
-  name   = "linux"
-  ttl    = 300
-  value  = var.offprem_ip
-}
-
-resource "digitalocean_record" "linux_install_party_ntnu_record" {
-  domain = var.login
-  type   = "A"
-  name   = "ntnu.linux"
-  ttl    = 300
-  value  = "128.39.142.60"
-}
-
-resource "digitalocean_record" "linux_install_party_ovhcloud_record" {
-  domain = var.login
-  type   = "CNAME"
-  name   = "ovhcloud.linux"
-  ttl    = 300
-  value  = "tekkom-linux.s3.de.io.cloud.ovh.net."
+resource "ovh_domain_zone_record" "linux_ovhcloud_cname" {
+  zone      = var.login
+  subdomain = "ovhcloud.linux"
+  fieldtype = "CNAME"
+  ttl       = local.ttl_low
+  target    = "tekkom-linux.s3.de.io.cloud.ovh.net."
 }
