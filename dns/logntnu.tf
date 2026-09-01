@@ -1,48 +1,47 @@
-resource "digitalocean_domain" "logntnu" {
-  name = "logntnu.no"
+resource "ovh_domain_zone_record" "logntnu_discord" {
+  zone      = "logntnu.no"
+  subdomain = "discord"
+  fieldtype = "CNAME"
+  ttl       = local.ttl_low
+  target    = "discord.login.no."
 }
 
-resource "digitalocean_record" "discord" {
-  domain = digitalocean_domain.logntnu.name
-  type   = "CNAME"
-  name   = "discord"
-  value  = "discord.login.no."
+resource "ovh_domain_zone_record" "logntnu_autodiscover" {
+  zone      = "logntnu.no"
+  subdomain = "autodiscover"
+  fieldtype = "CNAME"
+  ttl       = local.ttl_low
+  target    = "autodiscover.emailsrvr.com."
 }
 
-resource "digitalocean_record" "autodiscover" {
-  domain = digitalocean_domain.logntnu.name
-  type   = "CNAME"
-  name   = "autodiscover"
-  value  = "autodiscover.emailsrvr.com."
+resource "ovh_domain_zone_record" "logntnu_git_spf" {
+  zone      = "logntnu.no"
+  subdomain = "git"
+  fieldtype = "TXT"
+  ttl       = local.ttl_low
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=spf1 include:emailsrvr.com ~all")))
 }
 
-resource "digitalocean_record" "txt_git_spf" {
-  domain = digitalocean_domain.logntnu.name
-  type   = "TXT"
-  name   = "git"
-  value  = "v=spf1 include:emailsrvr.com ~all"
+resource "ovh_domain_zone_record" "logntnu_git_mx1" {
+  zone      = "logntnu.no"
+  subdomain = "git"
+  fieldtype = "MX"
+  ttl       = local.ttl_low
+  target    = "10 mx1.emailsrvr.com."
 }
 
-resource "digitalocean_record" "mx_git1" {
-  domain   = digitalocean_domain.logntnu.name
-  type     = "MX"
-  name     = "git"
-  value    = "mx1.emailsrvr.com."
-  priority = 10
+resource "ovh_domain_zone_record" "logntnu_git_mx2" {
+  zone      = "logntnu.no"
+  subdomain = "git"
+  fieldtype = "MX"
+  ttl       = local.ttl_low
+  target    = "20 mx2.emailsrvr.com."
 }
 
-resource "digitalocean_record" "mx_git2" {
-  domain   = digitalocean_domain.logntnu.name
-  type     = "MX"
-  name     = "git"
-  value    = "mx2.emailsrvr.com."
-  priority = 20
+resource "ovh_domain_zone_record" "logntnu_git_dmarc" {
+  zone      = "logntnu.no"
+  subdomain = "_dmarc.git"
+  fieldtype = "TXT"
+  ttl       = local.ttl_low
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=DMARC1; p=quarantine; rua=mailto:tekkom@logntnu.no")))
 }
-
-resource "digitalocean_record" "txt_git_dmarc" {
-  domain = digitalocean_domain.logntnu.name
-  type   = "TXT"
-  name   = "_dmarc.git"
-  value  = "v=DMARC1; p=quarantine; rua=mailto:tekkom@logntnu.no"
-}
-

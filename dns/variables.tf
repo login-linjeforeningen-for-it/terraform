@@ -27,3 +27,9 @@ variable "offprem_ip" {
   description = "The IP of the offprem server"
   default     = "57.129.124.84"
 }
+
+variable "enable_dmarc_report_authorization" {
+  type        = bool
+  description = "Publish <domain>._report._dmarc.login.no TXT so external receivers send DMARC aggregate reports to postmaster@login.no (RFC 7489 7.1)."
+  default     = true
+}

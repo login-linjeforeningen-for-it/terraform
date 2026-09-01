@@ -3,9 +3,6 @@ output "domain_names" {
 }
 
 output "nameservers" {
-  value = alltrue([
-      for idx, domain in data.domeneshop_domains.domains.domains : alltrue([
-        for i in range(3) : domain.nameservers[i] == "ns${i + 1}.digitalocean.com"
-      ])
-    ])
+  description = "Current registry nameservers per domain"
+  value       = { for domain in data.domeneshop_domains.domains.domains : domain.domain => domain.nameservers }
 }

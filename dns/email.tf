@@ -65,92 +65,97 @@ locals {
       ]
     }
   ]
-  email_domains = [
-    for d in local.whitelist_domains : d.domain
-  ]
-  blacklist_domains = [for d in module.domeneshop.domain_names : d if !contains(local.email_domains, d)]
-}
 
-// --------------------- Whitelist ---------------------
-locals {
-  // Flatten MX records for all whitelisted domains
+  email_domains = [for d in local.whitelist_domains : d.domain]
+
+  blacklist_domains = [for d in local.managed_domains : d if !contains(local.email_domains, d)]
+
+  wl_sub = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c.name == "@" ? "" : c.name }
+
   mx_records = flatten([
     for domain in local.whitelist_domains : [
       for mx in domain.mx_records : {
-        domain   = domain.domain
-        name     = domain.name
-        value    = mx.value
-        priority = mx.priority
+        key       = "${domain.domain}-${domain.name}-${mx.value}-${mx.priority}"
+        domain    = domain.domain
+        subdomain = domain.name == "@" ? "" : domain.name
+        target    = "${mx.priority} ${mx.value}"
       }
     ]
   ])
 }
 
-resource "digitalocean_record" "mx_record" {
-  for_each = tomap({ for rec in local.mx_records : "${rec.domain}-${rec.name}-${rec.value}-${rec.priority}" => rec })
-  domain   = each.value.domain
-  type     = "MX"
-  name     = each.value.name
-  value    = each.value.value
-  priority = each.value.priority
+# --------------------- Whitelist ---------------------
+
+resource "ovh_domain_zone_record" "mx_record" {
+  for_each  = { for rec in local.mx_records : rec.key => rec }
+  zone      = each.value.domain
+  subdomain = each.value.subdomain
+  fieldtype = "MX"
+  ttl       = local.ttl_low
+  target    = each.value.target
 }
 
-resource "digitalocean_record" "spf_allow" {
-  for_each = { for c in local.whitelist_domains : "${c.domain}-${c.name}-${c.spf}" => c }
-  domain   = each.value.domain
-  type     = "TXT"
-  name     = each.value.name
-  value    = each.value.spf
+resource "ovh_domain_zone_record" "spf_allow" {
+  for_each  = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c }
+  zone      = each.value.domain
+  subdomain = local.wl_sub["${each.value.domain}-${each.value.name}"]
+  fieldtype = "TXT"
+  ttl       = local.ttl_low
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", each.value.spf)))
 }
 
-resource "digitalocean_record" "dkim_allow" {
-  for_each = { for c in local.whitelist_domains : "${c.domain}-${c.name}-${c.dkim.selector}" => c }
-  domain   = each.value.domain
-  type     = "TXT"
-  name     = "${each.value.dkim.selector}._domainkey${each.value.name == "@" ? "" : ".${each.value.name}"}"
-  value    = each.value.dkim.key
+resource "ovh_domain_zone_record" "dkim_allow" {
+  for_each  = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c }
+  zone      = each.value.domain
+  subdomain = "${each.value.dkim.selector}._domainkey${each.value.name == "@" ? "" : ".${each.value.name}"}"
+  fieldtype = "TXT"
+  ttl       = local.ttl_low
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", each.value.dkim.key)))
 }
 
-// --------------------- Blacklist ---------------------
-# Blocks all SPF (Sender Policy Framework) email sending for the specified domains.
-resource "digitalocean_record" "spf_block" {
-  for_each = toset(local.blacklist_domains)
-  domain   = each.key
-  type     = "TXT"
-  name     = "@"
-  value    = "v=spf1 -all"
+resource "ovh_domain_zone_record" "dmarc_whitelist" {
+  for_each  = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c }
+  zone      = each.value.domain
+  subdomain = "_dmarc${each.value.name == "@" ? "" : ".${each.value.name}"}"
+  fieldtype = "TXT"
+  ttl       = local.ttl_low
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s; rua=mailto:postmaster@login.no")))
 }
 
-# Blocks any DKIM (DomainKeys Identified Mail) signatures for the specified domains.
-resource "digitalocean_record" "dkim_block" {
-  for_each = toset(local.blacklist_domains)
-  domain   = each.key
-  name     = "*._domainkey"
-  type     = "TXT"
-  value    = "v=DKIM1; p="
+# --------------------- Blacklist: parked domains send no mail ---------------------
+
+resource "ovh_domain_zone_record" "spf_block" {
+  for_each  = toset(local.blacklist_domains)
+  zone      = each.key
+  subdomain = ""
+  fieldtype = "TXT"
+  ttl       = local.ttl_std
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=spf1 -all")))
 }
 
-// --------------------- DMARC ---------------------
-resource "digitalocean_record" "dmarc_whitelist" {
-  for_each = { for c in local.whitelist_domains : "${c.domain}-${c.name}-${c.dkim.selector}" => c }
-  domain   = each.value.domain
-  type     = "TXT"
-  name     = "_dmarc${each.value.name == "@" ? "" : ".${each.value.name}"}"
-  value    = "v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s; rua=mailto:postmaster@login.no"
+resource "ovh_domain_zone_record" "dkim_block" {
+  for_each  = toset(local.blacklist_domains)
+  zone      = each.key
+  subdomain = "*._domainkey"
+  fieldtype = "TXT"
+  ttl       = local.ttl_std
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=DKIM1; p=")))
 }
 
-resource "digitalocean_record" "dmarc_blacklist" {
-  for_each = toset(local.blacklist_domains)
-  domain   = each.key
-  name     = "_dmarc"
-  type     = "TXT"
-  value    = "v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s; rua=mailto:postmaster@login.no"
+resource "ovh_domain_zone_record" "dmarc_blacklist" {
+  for_each  = toset(local.blacklist_domains)
+  zone      = each.key
+  subdomain = "_dmarc"
+  fieldtype = "TXT"
+  ttl       = local.ttl_std
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s; rua=mailto:postmaster@login.no")))
 }
 
-# TODO:
-# - Remove DO_create domain module
-# - Add domain resource for all domains
-# - Add A record for all domains pointing
-# - Remove git.logntnu.no mx records
-# - Clean up logntnu.tf
-# - Check the configuration
+resource "ovh_domain_zone_record" "dmarc_report_auth" {
+  for_each  = var.enable_dmarc_report_authorization ? toset([for d in local.managed_domains : d if d != var.login]) : toset([])
+  zone      = var.login
+  subdomain = "${each.value}._report._dmarc"
+  fieldtype = "TXT"
+  ttl       = local.ttl_std
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=DMARC1")))
+}
