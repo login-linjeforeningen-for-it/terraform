@@ -3,25 +3,25 @@ resource "ovh_domain_zone_record" "apex_a" {
   zone      = each.value
   subdomain = ""
   fieldtype = "A"
-  ttl       = local.zone_ttl[each.value]
+  ttl       = var.ttl
   target    = var.onprem_ip
 }
 
 # ---------------- login.no service records ----------------
 
-resource "ovh_domain_zone_record" "cdn_cname" {
+resource "ovh_domain_zone_record" "www_cname" {
   zone      = var.login
-  subdomain = "cdn"
+  subdomain = "www"
   fieldtype = "CNAME"
-  ttl       = local.ttl_low
-  target    = "beehive.ams3.cdn.digitaloceanspaces.com."
+  ttl       = var.ttl
+  target    = "login.no."
 }
 
 resource "ovh_domain_zone_record" "login_wildcard_a" {
   zone      = var.login
   subdomain = "*"
   fieldtype = "A"
-  ttl       = local.ttl_low
+  ttl       = var.ttl
   target    = var.onprem_ip
 }
 
@@ -29,7 +29,7 @@ resource "ovh_domain_zone_record" "vaultwarden_a" {
   zone      = var.login
   subdomain = "vault"
   fieldtype = "A"
-  ttl       = local.ttl_low
+  ttl       = var.ttl
   target    = var.offprem_ip
 }
 
@@ -37,7 +37,7 @@ resource "ovh_domain_zone_record" "zammad_a" {
   zone      = var.login
   subdomain = "zammad"
   fieldtype = "A"
-  ttl       = local.ttl_low
+  ttl       = var.ttl
   target    = var.offprem_ip
 }
 
@@ -45,32 +45,22 @@ resource "ovh_domain_zone_record" "offprem_a" {
   zone      = var.login
   subdomain = "offprem"
   fieldtype = "A"
-  ttl       = local.ttl_low
+  ttl       = var.ttl
   target    = var.offprem_ip
 }
 
-# ---------------- Linux install party ----------------
-
-resource "ovh_domain_zone_record" "linux_a" {
+resource "ovh_domain_zone_record" "authentik_a" {
   zone      = var.login
-  subdomain = "linux"
+  subdomain = "authentik"
   fieldtype = "A"
-  ttl       = local.ttl_low
+  ttl       = var.ttl
   target    = var.offprem_ip
 }
 
-resource "ovh_domain_zone_record" "linux_ntnu_a" {
+resource "ovh_domain_zone_record" "forms_a" {
   zone      = var.login
-  subdomain = "ntnu.linux"
+  subdomain = "forms"
   fieldtype = "A"
-  ttl       = local.ttl_low
-  target    = "128.39.142.60"
-}
-
-resource "ovh_domain_zone_record" "linux_ovhcloud_cname" {
-  zone      = var.login
-  subdomain = "ovhcloud.linux"
-  fieldtype = "CNAME"
-  ttl       = local.ttl_low
-  target    = "tekkom-linux.s3.de.io.cloud.ovh.net."
+  ttl       = var.ttl
+  target    = var.onprem_ip
 }

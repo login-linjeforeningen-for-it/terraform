@@ -4,12 +4,6 @@ variable "login" {
   default     = "login.no"
 }
 
-variable "logout" {
-  type        = string
-  description = "logout.no domain name"
-  default     = "logout.no"
-}
-
 variable "onprem_mgmt_ip" {
   type        = string
   description = "The IP of the onprem management server"
@@ -32,4 +26,15 @@ variable "enable_dmarc_report_authorization" {
   type        = bool
   description = "Publish <domain>._report._dmarc.login.no TXT so external receivers send DMARC aggregate reports to postmaster@login.no (RFC 7489 7.1)."
   default     = true
+}
+
+variable "ttl" {
+  type        = number
+  description = "TTL in seconds for every record in this stack"
+  default     = 3600
+
+  validation {
+    condition     = var.ttl >= 60 && var.ttl <= 86400
+    error_message = "ttl must be between 60 and 86400 seconds."
+  }
 }

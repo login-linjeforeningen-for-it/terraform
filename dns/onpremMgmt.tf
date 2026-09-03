@@ -15,7 +15,7 @@ resource "ovh_domain_zone_record" "onprem_mgmt_a" {
   zone      = var.login
   subdomain = "onprem"
   fieldtype = "A"
-  ttl       = local.ttl_low
+  ttl       = var.ttl
   target    = var.onprem_mgmt_ip
 }
 
@@ -24,6 +24,6 @@ resource "ovh_domain_zone_record" "onprem_cname_records" {
   zone      = var.login
   subdomain = each.value
   fieldtype = "CNAME"
-  ttl       = local.ttl_low
+  ttl       = var.ttl
   target    = "onprem.${var.login}."
 }

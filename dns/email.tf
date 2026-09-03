@@ -70,56 +70,62 @@ locals {
 
   blacklist_domains = [for d in local.managed_domains : d if !contains(local.email_domains, d)]
 
-  wl_sub = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c.name == "@" ? "" : c.name }
+  dmarc_policy = "v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s; rua=mailto:postmaster@${var.login}"
 
-  mx_records = flatten([
-    for domain in local.whitelist_domains : [
-      for mx in domain.mx_records : {
-        key       = "${domain.domain}-${domain.name}-${mx.value}-${mx.priority}"
-        domain    = domain.domain
-        subdomain = domain.name == "@" ? "" : domain.name
+  # Keyed by "<zone>-<name>", with the "@" -> "" subdomain translation applied once.
+  whitelist = {
+    for c in local.whitelist_domains : "${c.domain}-${c.name}" => merge(c, {
+      sub = c.name == "@" ? "" : c.name
+    })
+  }
+
+  mx_records = merge([
+    for key, c in local.whitelist : {
+      for mx in c.mx_records : "${key}-${mx.value}-${mx.priority}" => {
+        domain    = c.domain
+        subdomain = c.sub
         target    = "${mx.priority} ${mx.value}"
       }
-    ]
-  ])
+    }
+  ]...)
 }
 
 # --------------------- Whitelist ---------------------
 
 resource "ovh_domain_zone_record" "mx_record" {
-  for_each  = { for rec in local.mx_records : rec.key => rec }
+  for_each  = local.mx_records
   zone      = each.value.domain
   subdomain = each.value.subdomain
   fieldtype = "MX"
-  ttl       = local.ttl_low
+  ttl       = var.ttl
   target    = each.value.target
 }
 
 resource "ovh_domain_zone_record" "spf_allow" {
-  for_each  = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c }
+  for_each  = local.whitelist
   zone      = each.value.domain
-  subdomain = local.wl_sub["${each.value.domain}-${each.value.name}"]
+  subdomain = each.value.sub
   fieldtype = "TXT"
-  ttl       = local.ttl_low
+  ttl       = var.ttl
   target    = join(" ", formatlist("%q", regexall(".{1,255}", each.value.spf)))
 }
 
 resource "ovh_domain_zone_record" "dkim_allow" {
-  for_each  = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c }
+  for_each  = local.whitelist
   zone      = each.value.domain
-  subdomain = "${each.value.dkim.selector}._domainkey${each.value.name == "@" ? "" : ".${each.value.name}"}"
+  subdomain = "${each.value.dkim.selector}._domainkey${each.value.sub == "" ? "" : ".${each.value.sub}"}"
   fieldtype = "TXT"
-  ttl       = local.ttl_low
+  ttl       = var.ttl
   target    = join(" ", formatlist("%q", regexall(".{1,255}", each.value.dkim.key)))
 }
 
 resource "ovh_domain_zone_record" "dmarc_whitelist" {
-  for_each  = { for c in local.whitelist_domains : "${c.domain}-${c.name}" => c }
+  for_each  = local.whitelist
   zone      = each.value.domain
-  subdomain = "_dmarc${each.value.name == "@" ? "" : ".${each.value.name}"}"
+  subdomain = "_dmarc${each.value.sub == "" ? "" : ".${each.value.sub}"}"
   fieldtype = "TXT"
-  ttl       = local.ttl_low
-  target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s; rua=mailto:postmaster@login.no")))
+  ttl       = var.ttl
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", local.dmarc_policy)))
 }
 
 # --------------------- Blacklist: parked domains send no mail ---------------------
@@ -129,7 +135,7 @@ resource "ovh_domain_zone_record" "spf_block" {
   zone      = each.key
   subdomain = ""
   fieldtype = "TXT"
-  ttl       = local.ttl_std
+  ttl       = var.ttl
   target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=spf1 -all")))
 }
 
@@ -138,7 +144,7 @@ resource "ovh_domain_zone_record" "dkim_block" {
   zone      = each.key
   subdomain = "*._domainkey"
   fieldtype = "TXT"
-  ttl       = local.ttl_std
+  ttl       = var.ttl
   target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=DKIM1; p=")))
 }
 
@@ -147,8 +153,8 @@ resource "ovh_domain_zone_record" "dmarc_blacklist" {
   zone      = each.key
   subdomain = "_dmarc"
   fieldtype = "TXT"
-  ttl       = local.ttl_std
-  target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s; rua=mailto:postmaster@login.no")))
+  ttl       = var.ttl
+  target    = join(" ", formatlist("%q", regexall(".{1,255}", local.dmarc_policy)))
 }
 
 resource "ovh_domain_zone_record" "dmarc_report_auth" {
@@ -156,6 +162,6 @@ resource "ovh_domain_zone_record" "dmarc_report_auth" {
   zone      = var.login
   subdomain = "${each.value}._report._dmarc"
   fieldtype = "TXT"
-  ttl       = local.ttl_std
+  ttl       = var.ttl
   target    = join(" ", formatlist("%q", regexall(".{1,255}", "v=DMARC1")))
 }
