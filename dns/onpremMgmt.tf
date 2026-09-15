@@ -7,7 +7,7 @@ locals {
     "truenas",
     "pelican",
     "pfsense",
-    "wings",
+    "usb",
   ]
 }
 
