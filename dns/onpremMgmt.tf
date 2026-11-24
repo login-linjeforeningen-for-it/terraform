@@ -8,6 +8,7 @@ locals {
     "pelican",
     "pfsense",
     "usb",
+    "wazuh",
   ]
 }
 
